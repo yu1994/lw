@@ -1,25 +1,36 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view />
+    <keep-alive>
+      <router-view />
+    </keep-alive>
   </div>
 </template>
+<script>
+const baseSize = 75;
+export default {
+  data() {
+    return {};
+  },
+  mounted() {
+    this.setRem();
+  },
+  methods: {
+    setRem() {
+      let width =
+        window.innerWidth ||
+        document.documentElement.clientWidth ||
+        document.body.clientWidth;
+      if (width >= 640) width = 640;
+      const scale = width / 750;
+      document.documentElement.style.fontSize = `${baseSize *
+        Math.min(scale, 2)}px`;
+    }
+  }
+};
+</script>
 <style lang="stylus">
 #app
   font-family 'Avenir', Helvetica, Arial, sans-serif
   -webkit-font-smoothing antialiased
   -moz-osx-font-smoothing grayscale
-  text-align center
-  color #2c3e50
-
-#nav
-  padding 30px
-  a
-    font-weight bold
-    color #2c3e50
-    &.router-link-exact-active
-      color #42b983
 </style>

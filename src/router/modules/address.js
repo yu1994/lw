@@ -1,7 +1,7 @@
 export default [
   {
     path: "/address",
-    name: "address",
+    name: "Address",
     component: () =>
       import(/* webpackChunkName: "about" */ "@/views/Address")
   }

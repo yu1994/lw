@@ -10,20 +10,20 @@ const modules = modulesFiles.keys().reduce((modules, modulePath) => {
 }, []);
 
 Vue.use(Router);
-
+export const routes = [
+  ...modules,
+  {
+    path: "/",
+    name: "Home",
+    redirect: "/custom-list",
+    component: Home
+  },
+  {
+    path: "/test",
+    name: "Test",
+    component: () => import("@/views/test")
+  }
+];
 export default new Router({
-  routes: [
-    ...modules,
-    {
-      path: "/",
-      name: "home",
-      redirect: "/custom-list",
-      component: Home
-    },
-    {
-      path: "/test",
-      name: "test",
-      component: () => import("@/views/test")
-    }
-  ]
+  routes
 });

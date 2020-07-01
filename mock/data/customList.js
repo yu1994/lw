@@ -2,11 +2,11 @@ import Mock from "mockjs";
 const List = [];
 const count = 10;
 const URL = {
-  phone: "http://192.144.129.220/img/phone.png",
-  bg: "http://192.144.129.220/img/bg.png",
-  theme: "http://192.144.129.220/img/bg-theme.png",
-  theme2: "http://192.144.129.220/img/bg-theme2.png",
-  mask: "http://192.144.129.220/img/phone.fw.png"
+  phone: "/origin/phone.png",
+  bg: "/origin/bg.png",
+  theme: "/origin/bg-theme.png",
+  theme2: "/origin/bg-theme2.png",
+  mask: "/origin/phone.fw.png"
 };
 
 for (let i = 0; i < count; i++) {
@@ -41,8 +41,6 @@ for (let i = 0; i < count; i++) {
       },
       bgTheme: i % 2 === 0 ? URL.theme2 : URL.theme,
       isTheme: i !== 0,
-      pw: 292,
-      ph: 603
     })
   );
 }
@@ -57,7 +55,9 @@ export default [
         background: URL.bg,
         phone: URL.phone,
         mask: URL.mask,
-        list: List
+        list: List,
+        pw: 292,
+        ph: 603
       }
     })
   }

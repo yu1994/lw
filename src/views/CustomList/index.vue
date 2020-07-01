@@ -52,7 +52,11 @@
                 ref="themePanel"
                 :style="{ backgroundImage: 'url(' + result.phone + ')' }"
               >
-                <div class="panel-mask" :style="{}" @click="previewHandle(item)">
+                <div
+                  class="panel-mask"
+                  :style="{}"
+                  @click="previewHandle(item)"
+                >
                   <!-- maskImage: 'url(' + result.mask + ')'-->
                   <div class="compile-area">
                     <div
@@ -130,22 +134,22 @@
 </template>
 
 <script>
-import { customListAPI } from "../../../mock/API/mock-customList-api";
+import { customListMockAPI } from "../../../mock/API/mock-customList-api";
+import { customListAPI, customMaterialAPI } from "@/api/customListAPI";
 
 export default {
   name: "CustomList",
   data() {
     return {
+      materialList: [],
       picSetting: {
         count: 1,
         accept: ".png, .jpg, .jpeg",
         maxSize: "10 * 1024 * 1024"
       },
-      show: false,
+      show: true,
       result: {},
       photo: "",
-      pw: 292,
-      ph: 603,
       ratio: {
         w: 0,
         h: 0,
@@ -161,6 +165,8 @@ export default {
   },
   methods: {
     async init() {
+      await this.getCustomListMockAPI();
+      // await this.getCustomMaterialAPI();
       await this.getCustomListAPI();
       this.$nextTick(() => {
         let width =
@@ -173,14 +179,15 @@ export default {
         // }
         const themePanelList = this.$refs.themePanel;
         for (let i = 0, len = themePanelList.length; i < len; i += 1) {
-          themePanelList[i].style.width = (width / (this.pw * 2)) * 100 + "%";
+          themePanelList[i].style.width =
+            (width / (this.result.pw * 2)) * 100 + "%";
         }
         const themePanel = themePanelList[0];
         this.ratio.w = themePanel.clientWidth || themePanel.offsetWidth;
-        const ratio = this.ratio.w / this.pw;
-        this.ratio.h = ratio * this.ph;
+        const ratio = this.ratio.w / this.result.pw;
+        this.ratio.h = ratio * this.result.ph;
         for (let i = 0, len = themePanelList.length; i < len; i += 1) {
-          themePanelList[i].style.height = ratio * this.ph + "px";
+          themePanelList[i].style.height = ratio * this.result.ph + "px";
         }
         this.ratio.paperW = this.ratio.w / 900;
         this.ratio.paperH = this.ratio.h / 1800;
@@ -201,12 +208,27 @@ export default {
       this.fileList.push(file);
       this.show = false;
     },
-    getCustomListAPI() {
+    getCustomListMockAPI() {
       return new Promise(resolve => {
-        customListAPI().then(response => {
+        customListMockAPI().then(response => {
           this.result = response.data;
           resolve(true);
         });
+      });
+    },
+    getCustomListAPI() {
+      return new Promise(resolve => {
+        customListAPI().then(response => {
+          // this.result = response.data;
+          console.info(response);
+          resolve(true);
+        });
+      });
+    },
+    getCustomMaterialAPI() {
+      customMaterialAPI().then(response => {
+        this.materialList = []
+        console.info(response)
       });
     },
     previewHandle(item) {
@@ -246,6 +268,7 @@ export default {
             position relative
             margin-bottom 16px
             background-size 100% auto
+            background-repeat no-repeat
             .panel-mask
               position absolute
               left 0
@@ -268,6 +291,7 @@ export default {
                 bottom 0
                 z-index 90
                 background-size 100% auto
+                background-repeat no-repeat
             .panel-paper
               position absolute
               width 100%
@@ -275,6 +299,7 @@ export default {
               .paper
                 position absolute
                 background-color rebeccapurple
+                background-repeat no-repeat
                 .paper-bg
                   position absolute
                   top -20px

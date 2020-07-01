@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <keep-alive>
+    <keep-alive :exclude="keepAlive">
       <router-view />
     </keep-alive>
   </div>
@@ -10,6 +10,11 @@ const baseSize = 75;
 export default {
   data() {
     return {};
+  },
+  computed: {
+    keepAlive() {
+      return this.$store.getters.keepAliveExclude;
+    }
   },
   mounted() {
     this.setRem();

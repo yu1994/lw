@@ -24,7 +24,7 @@ function addStyleResource(rule) {
       ]
     });
 }
-const port =  9000;
+const port = 9000;
 module.exports = {
   // runtimeCompiler: true
   // transpileDependencies: ['vuex-persist'],
@@ -98,11 +98,25 @@ module.exports = {
       errors: true
     },
     proxy: {
+      [process.env.VUE_APP_BASE_API]: {
+        target: `https://api.lwzzr.com`,
+        changeOrigin: true,
+        pathRewrite: {
+          [`^${process.env.VUE_APP_BASE_API}`]: ""
+        }
+      },
       [process.env.VUE_APP_BASE_MOCK_API]: {
         target: `http://127.0.0.1:${port}/mock`,
         changeOrigin: true,
         pathRewrite: {
           [`^${process.env.VUE_APP_BASE_MOCK_API}`]: ""
+        }
+      },
+      [process.env.VUE_APP_BASE_ORIGIN_API]: {
+        target: `http://192.144.129.220/img`,
+        changeOrigin: true,
+        pathRewrite: {
+          [`^${process.env.VUE_APP_BASE_ORIGIN_API}`]: ""
         }
       }
     },

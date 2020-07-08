@@ -58,3 +58,20 @@ export function drawImage(context, url, ratio) {
     };
   });
 }
+
+export function getInnerWidth() {
+  let width =
+    window.innerWidth ||
+    document.documentElement.clientWidth ||
+    document.body.clientWidth;
+  if (width >= 640) width = 640;
+  return width;
+}
+export function createImgHandle(file) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.src = file.content;
+    img.onload = () => resolve(img);
+  });
+}
+export function scaleRatio() {}

@@ -6,7 +6,10 @@ const URL = {
   bg: "/origin/bg.png",
   theme: "/origin/bg-theme.png",
   theme2: "/origin/bg-theme2.png",
-  mask: "/origin/phone.fw.png"
+  mask: "/origin/phone.fw.png",
+  maxPhone: "/origin/max.png",
+  maxPhoneMask: "/origin/max-mask.png",
+  cover: "/origin/cover.png"
 };
 
 for (let i = 0; i < count; i++) {
@@ -17,8 +20,8 @@ for (let i = 0; i < count; i++) {
       background: URL.bg,
       phone: URL.phone,
       mask: URL.mask,
-      height: 1800,
-      width: 900,
+      imgHeight: 1800,
+      imgWidth: 900,
       headArea: [
         {
           x: -16.6,
@@ -39,8 +42,8 @@ for (let i = 0; i < count; i++) {
         centerX: i === 0 ? 900 / 2 : 900 / 2,
         centerY: i % 2 === 0 ? 1800 / 2 : i === 0 ? 1800 / 2 : 524 / 2 + 1026
       },
-      bgTheme: i % 2 === 0 ? URL.theme2 : URL.theme,
-      isTheme: i !== 0,
+      imgUrl: i % 2 === 0 ? URL.theme2 : URL.theme,
+      isTheme: i !== 0
     })
   );
 }
@@ -58,6 +61,24 @@ export default [
         list: List,
         pw: 292,
         ph: 603
+      }
+    })
+  },
+  {
+    url: "/custom/design",
+    type: "get",
+    response: config => ({
+      code: 20000,
+      data: {
+        backImageWidth: 800,
+        backImageHeight: 800,
+        backImage: URL.maxPhone,
+        editImage: URL.maxPhoneMask,
+        hiddenImage: URL.cover,
+        viewImageWidth: 292,
+        viewImageHeight: 610,
+        offsetX: 254,
+        offsetY: 95
       }
     })
   }

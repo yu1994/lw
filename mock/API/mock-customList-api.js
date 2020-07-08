@@ -6,3 +6,10 @@ export function customListMockAPI() {
     method: "get"
   });
 }
+
+export function customDesignMockAPI() {
+  return request({
+    url: "/custom/design",
+    method: "get"
+  });
+}

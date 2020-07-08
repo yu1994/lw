@@ -19,3 +19,14 @@ export function customMaterialAPI() {
     url: "/product/material"
   });
 }
+
+/**
+ *@description 获取手机模型
+* */
+export function customDesignAPI(params) {
+  return request({
+    url: "/product/customized",
+    method: "get",
+    params
+  });
+}

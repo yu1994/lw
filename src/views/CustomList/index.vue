@@ -36,67 +36,82 @@
         </div>
         <!--</van-sticky>-->
       </div>
-      <div
-        class="list"
-        :style="{ backgroundImage: 'url(' + result.background + ')' }"
-      >
+      <div class="list">
+        <!--  :style="{ backgroundImage: 'url(' + result.background + ')' }"  -->
         <div class="theme-list">
           <div
             class="theme-list-item"
             v-for="(item, key) in result.list"
             :key="key"
           >
-            <div class="layout">
+            <!-- <pack-phone-layout ref="layout" :item="item" :design="design" :current-file="currentFile" :theme-attr="themeAttr"/>-->
+            <div class="layout" ref="layout">
               <div
                 class="panel"
                 ref="themePanel"
-                :style="{ backgroundImage: 'url(' + result.phone + ')' }"
+                :style="{ backgroundImage: 'url(' + design.backImage + ')' }"
               >
                 <div
                   class="panel-mask"
-                  :style="{}"
+                  :style="{ maskImage: 'url(' + design.editImage + ')' }"
                   @click="previewHandle(item)"
                 >
-                  <!-- maskImage: 'url(' + result.mask + ')'-->
-                  <div class="compile-area">
+                  <div class="compile-area" ref="compileArea">
                     <div
-                      v-if="item.isTheme"
-                      class="bg"
+                      v-if="item.imgUrl"
+                      class="compile-area-theme"
+                      ref="themeBg"
                       :style="{
-                        backgroundImage: 'url(' + item.bgTheme + ')'
+                        backgroundImage: 'url(' + item.imgUrl + ')'
                       }"
                     ></div>
-                    <div class="panel-paper">
+                    <div class="compile-area-edit">
                       <div
-                        class="paper"
+                        ref="editPaper"
+                        class="compile-area-edit-paper"
+                        v-for="(paper, index) in item.materialExtendList"
+                        :key="index"
                         :style="{
                           left:
-                            (item.area.centerX - item.area.w / 2) *
-                              ratio.paperW +
+                            (paper.centralX - paper.width / 2) *
+                              (themeAttr.width / item.imgWidth) +
                             'PX',
-                          width: item.area.w * ratio.paperW + 'PX',
+                          width:
+                            paper.width * (themeAttr.width / item.imgWidth) +
+                            'PX',
                           top:
-                            (item.area.centerY - item.area.h / 2) *
-                              ratio.paperH +
+                            (paper.centralY - paper.heigth / 2) *
+                              (themeAttr.height / item.imgHeight) +
                             'PX',
-                          height: item.area.h * ratio.paperH + 'PX'
+                          height:
+                            paper.heigth * (themeAttr.height / item.imgHeight) +
+                            'PX'
                         }"
                       >
                         <div
                           v-if="currentFile.length > 0"
-                          class="paper-bg"
+                          class="compile-area-edit-paper-bg"
                           :style="{
+                            width:
+                              paper.width * (themeAttr.width / item.imgWidth) +
+                              'px',
+                            height:
+                              ((paper.width *
+                                (themeAttr.width / item.imgWidth)) /
+                                currentImgAttr.w) *
+                                currentImgAttr.h +
+                              'px',
                             backgroundImage:
                               'url(' + currentFile[0].content + ')'
                           }"
                         ></div>
                       </div>
                     </div>
-                    <div
-                      class="panel-bg"
-                      :style="{ backgroundImage: 'url(' + result.phone + ')' }"
-                    ></div>
                   </div>
+                  <div
+                    class="cover-bg"
+                    :style="{ backgroundImage: 'url(' + design.hiddenImage + ')' }"
+                  ></div>
                 </div>
               </div>
             </div>
@@ -134,14 +149,19 @@
 </template>
 
 <script>
-import { customListMockAPI } from "../../../mock/API/mock-customList-api";
-import { customListAPI, customMaterialAPI } from "@/api/customListAPI";
+import {
+  customListMockAPI,
+  customDesignMockAPI
+} from "../../../mock/API/mock-customList-api";
+import { customListAPI, customMaterialAPI, customDesignAPI } from "@/api/customListAPI";
+import { getInnerWidth, createImgHandle } from "@/utils";
 
 export default {
   name: "CustomList",
   data() {
     return {
       materialList: [],
+      design: {},
       picSetting: {
         count: 1,
         accept: ".png, .jpg, .jpeg",
@@ -156,8 +176,25 @@ export default {
         paperW: 0,
         paperH: 0
       },
+      layoutRatio: {
+        // 总体比例
+        w: 0,
+        h: 0
+      },
       currentFile: [],
-      fileList: []
+      fileList: [],
+      currentImgAttr: {
+        w: 0,
+        h: 0
+      },
+      // 素材位置
+      themeAttr: {
+        width: 0,
+        height: 0,
+        left: 0,
+        top: 0
+      },
+      query: {}
     };
   },
   created() {
@@ -165,32 +202,34 @@ export default {
   },
   methods: {
     async init() {
+      this.query = this.$route.query;
+      /* 手机模型 */
+      await this.getCustomDesignMockAPI();
+      // await this.getCustomDesignAPI({})
+      /* 壁纸 */
       await this.getCustomListMockAPI();
-      // await this.getCustomMaterialAPI();
-      await this.getCustomListAPI();
+      await this.getCustomMaterialAPI({ category: 1, playingMethod: 4 });
+      // await this.getCustomListAPI();
       this.$nextTick(() => {
-        let width =
-          window.innerWidth ||
-          document.documentElement.clientWidth ||
-          document.body.clientWidth;
-        // console.log(width);
-        // if (this.pw * 2 > width) {
-        //   console.log(width / (this.pw * 2));
-        // }
+        let width = getInnerWidth();
+        this.layoutRatio.w = width / 2 / this.design.backImageWidth;
         const themePanelList = this.$refs.themePanel;
         for (let i = 0, len = themePanelList.length; i < len; i += 1) {
-          themePanelList[i].style.width =
-            (width / (this.result.pw * 2)) * 100 + "%";
+          themePanelList[i].style.height =
+            this.design.backImageHeight * this.layoutRatio.w + "px";
         }
-        const themePanel = themePanelList[0];
-        this.ratio.w = themePanel.clientWidth || themePanel.offsetWidth;
-        const ratio = this.ratio.w / this.result.pw;
-        this.ratio.h = ratio * this.result.ph;
-        for (let i = 0, len = themePanelList.length; i < len; i += 1) {
-          themePanelList[i].style.height = ratio * this.result.ph + "px";
+        const areaList = this.$refs.compileArea;
+        this.themeAttr.width = this.layoutRatio.w * this.design.viewImageWidth;
+        this.themeAttr.height = this.layoutRatio.w * this.design.viewImageHeight;
+        this.themeAttr.left = this.layoutRatio.w * this.design.offsetX;
+        this.themeAttr.top = this.layoutRatio.w * this.design.offsetY;
+        /* 素材 题材的位置 */
+        for (let i = 0, len = areaList.length; i < len; i += 1) {
+          areaList[i].style.width = this.themeAttr.width + "px";
+          areaList[i].style.height = this.themeAttr.height + "px";
+          areaList[i].style.left = this.themeAttr.left + "px";
+          areaList[i].style.top = this.themeAttr.top + "px";
         }
-        this.ratio.paperW = this.ratio.w / 900;
-        this.ratio.paperH = this.ratio.h / 1800;
       });
     },
     beforeRead(file) {
@@ -200,7 +239,10 @@ export default {
       }
       return true;
     },
-    afterRead(file) {
+    async afterRead(file) {
+      const img = await createImgHandle(file);
+      this.currentImgAttr.w = img.width;
+      this.currentImgAttr.h = img.height;
       this.currentFile = [];
       // 此时可以自行将文件上传至服务器
       this.currentFile.push(file);
@@ -211,7 +253,23 @@ export default {
     getCustomListMockAPI() {
       return new Promise(resolve => {
         customListMockAPI().then(response => {
-          this.result = response.data;
+          // this.result = response.data;
+          resolve(true);
+        });
+      });
+    },
+    getCustomDesignMockAPI() {
+      return new Promise(resolve => {
+        customDesignMockAPI().then(response => {
+          this.design = response.data;
+          resolve(true);
+        });
+      });
+    },
+    getCustomDesignAPI(params) {
+      return new Promise(resolve => {
+        customDesignAPI(params).then(response => {
+          this.design = response.data;
           resolve(true);
         });
       });
@@ -225,17 +283,28 @@ export default {
         });
       });
     },
-    getCustomMaterialAPI() {
-      customMaterialAPI().then(response => {
-        this.materialList = []
-        console.info(response)
+    getCustomMaterialAPI(params) {
+      return new Promise(resolve => {
+        customMaterialAPI(params).then(response => {
+          this.result = response.data;
+          this.materialList = response.data.materialExtendList;
+          resolve(true);
+        });
       });
     },
+    setLayoutHandle() {},
     previewHandle(item) {
-      this.$store.commit("parameter/SET_CURRENT_FILE", this.currentFile);
-      this.$store.commit("parameter/SET_RATIO", this.ratio);
-      this.$store.commit("parameter/SET_CUTTENT_THEME", item);
-      this.$router.push({ path: "custom-preview" });
+      this.$store.commit(
+        "mobileShellParameter/SET_CURRENT_FILE",
+        this.currentFile
+      );
+      this.$store.commit("mobileShellParameter/SET_DESIGN", this.design);
+      this.$store.commit("mobileShellParameter/SET_CUTTENT_THEME", item);
+      this.$store.commit(
+        "mobileShellParameter/SET_CURRENT_IMG_ATTR",
+        this.currentImgAttr
+      );
+      this.$router.push({ path: "custom-preview", query: this.query });
     }
   }
 };
@@ -264,8 +333,12 @@ export default {
         .layout
           display flex
           justify-content center
+          background-repeat no-repeat
+          background-size 100% auto
+          transform scale(1.7)
           .panel
             position relative
+            width 100%
             margin-bottom 16px
             background-size 100% auto
             background-repeat no-repeat
@@ -276,41 +349,33 @@ export default {
               width 100%
               height 100%
               mask-size 100% auto
-              mask-image url("../../assets/img/phone.fw.png")
               .compile-area
                 position absolute
-                left 0
-                top 0
-                width 100%
-                height 100%
-              .bg
-                position absolute
-                left 0
-                top 0
-                right 0
-                bottom 0
-                z-index 90
-                background-size 100% auto
-                background-repeat no-repeat
-            .panel-paper
+                .compile-area-theme
+                  position absolute
+                  left 0
+                  top 0
+                  right 0
+                  bottom 0
+                  z-index 90
+                  background-size 100% 100%
+                  background-repeat no-repeat
+            .compile-area-edit
               position absolute
               width 100%
               height 100%
-              .paper
+              .compile-area-edit-paper
                 position absolute
                 background-color rebeccapurple
                 background-repeat no-repeat
-                .paper-bg
+                .compile-area-edit-paper-bg
                   position absolute
-                  top -20px
-                  right 0
-                  bottom -20px
-                  z-index 7
                   left 0
-                  background-size cover
+                  z-index 7
                   background-repeat no-repeat
                   background-position 50%
-            .panel-bg
+                  background-size cover
+            .cover-bg
               position absolute
               left 0
               top 0
@@ -319,6 +384,9 @@ export default {
               z-index 100
               background-repeat no-repeat
               background-size 100% auto
+</style>
+<style scoped lang="stylus">
+.CustomList
   .uploadDialog
     text-align center
     h2

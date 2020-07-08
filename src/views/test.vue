@@ -1,7 +1,10 @@
 <template>
-  <div id="div1" ref="div1">
-    <div id="div2" ref="div2"></div>
-  </div>
+
+  <table>
+    <tr v-for="(item, key) in 10" :key="key">
+      <td v-for="(td, k) in 3" :key="k">{{td}}</td>
+    </tr>
+  </table>
 </template>
 
 <script>

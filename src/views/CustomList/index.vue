@@ -167,12 +167,6 @@ export default {
       show: true,
       result: {},
       photo: "",
-      ratio: {
-        w: 0,
-        h: 0,
-        paperW: 0,
-        paperH: 0
-      },
       layoutRatio: {
         // 总体比例
         w: 0,
@@ -240,7 +234,6 @@ export default {
     },
     async afterRead(file) {
       const img = await createImgHandle(file);
-      console.info(img.width)
       this.currentImgAttr.w = img.width;
       this.currentImgAttr.h = img.height;
       this.currentFile = [];
@@ -283,18 +276,11 @@ export default {
         });
       });
     },
-    setLayoutHandle() {},
     previewHandle(item) {
-      this.$store.commit(
-        "mobileShellParameter/SET_CURRENT_FILE",
-        this.currentFile
-      );
+      this.$store.commit("mobileShellParameter/SET_CURRENT_FILE", this.currentFile);
       this.$store.commit("mobileShellParameter/SET_DESIGN", this.design);
       this.$store.commit("mobileShellParameter/SET_CUTTENT_THEME", item);
-      this.$store.commit(
-        "mobileShellParameter/SET_CURRENT_IMG_ATTR",
-        this.currentImgAttr
-      );
+      this.$store.commit("mobileShellParameter/SET_CURRENT_IMG_ATTR", this.currentImgAttr);
       this.$router.push({ path: "custom-preview", query: this.query });
     }
   }

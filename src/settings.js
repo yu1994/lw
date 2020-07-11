@@ -3,7 +3,7 @@ module.exports = {
   /** @type {string}
    * @description website title
    * */
-  title: "1111",
+  title: "恋物制作人",
 
   /** @type {Array}
    * @description no judgement permission required */
@@ -23,10 +23,6 @@ module.exports = {
    * @description 判断是否 有 获取openid  judge 为 true 不去判断 */
   judge: mode !== "production", // mode !== 'production'
 
-  /** @type {Boolean}
-   * @description 微信 debug */
-  debug: false,
-
   /** *
    * @type {String} wxdf478c20c2f05d98 益往健康  wxc87d0aa97be32b04 建达通
    * */
@@ -42,8 +38,3 @@ module.exports = {
    * */
   aesIv: "9876543210kjwyzh"
 };
-/**
- * @description
- *3.不清楚生产路径
- *
- * */

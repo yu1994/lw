@@ -138,10 +138,10 @@
     </div>
     <div class="btn-wrap">
       <div class="btn-wrap-buy">
-        <!--<span>立即购买</span>-->
+        <span>立即购买</span>
       </div>
       <div class="btn-wrap-shopping" @click="shoppingHandle">
-       <!-- <span>加入购物车</span>-->
+        <span>加入购物车</span>
       </div>
     </div>
   </div>
@@ -315,7 +315,8 @@ export default {
             ).then(() => {
               let base64 = canvas.toDataURL("image/png"); //"image/png" 这里注意一下
               let img = document.getElementById("avatar");
-              img.setAttribute("src", base64);
+              img.setAttribute("src", base64);  // 测试
+              // 图片生成后 base64位转成  blob
               base64ToBlob(base64, 'image/png', new Date().getTime().toString() +'theme').then((res) => {
                 console.info(res)
               })

@@ -17,11 +17,6 @@ export const routes = [
     name: "Home",
     redirect: "/custom-list",
     component: Home
-  },
-  {
-    path: "/test",
-    name: "Test",
-    component: () => import("@/views/test")
   }
 ];
 export default new Router({

@@ -47,12 +47,12 @@ module.exports = {
       };
       // 优化 去除console.log vue/cli-service 配置源码使用了 terser-webpack-pulgin 插件
       //  /node_modules/@vue/cli-service/lib/prod.js
-      config.optimization.minimizer[0].options.terserOptions.compress.drop_console = true; // 去掉console
-      config.optimization.minimizer[0].options.terserOptions.compress.warnings = false;
-      config.optimization.minimizer[0].options.terserOptions.compress.drop_debugger = false;
-      config.optimization.minimizer[0].options.terserOptions.compress.pure_funcs = [
-        "console.log"
-      ];
+      // config.optimization.minimizer[0].options.terserOptions.compress.drop_console = true; // 去掉console
+      // config.optimization.minimizer[0].options.terserOptions.compress.warnings = false;
+      // config.optimization.minimizer[0].options.terserOptions.compress.drop_debugger = false;
+      // config.optimization.minimizer[0].options.terserOptions.compress.pure_funcs = [
+      //   "console.log"
+      // ];
       // config.plugins.push(new CompressionWebpackPlugin({
       //   algorithm: 'gzip',
       //   test: new RegExp(`\\.(${productionGzipExtensions.join('|')})$`),
@@ -62,10 +62,6 @@ module.exports = {
     }
     return {
       entry: ["babel-polyfill", "./src/main.js"],
-      // output: {
-      //   filename: `js/[name].${timestamp}.js`,
-      //   chunkFilename: `js/[name].${timestamp}.js`
-      // },
       name: defaultSettins.title
     };
   },

@@ -16,9 +16,13 @@ service.interceptors.request.use(
     // if (store.getters.token) {
     //   config.headers[tokenKey] = getToken();
     // }
-    config.headers.Authorization =
-      "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzdW5ueSIsImNyZWF0ZWQiOjE1OTQwNDY4MTIxMTcsImV4cCI6MTU5NDY1MTYxMn0.nyeUb6ux9zH7xkV4SML-LlYq9TwsQIZq_o0CUoSKP1Z1NFzF6nyturw_yzsomVhE_VI43ys-Xd6_WbqpFWNvKg";
-    config.headers.isError === false ? (hideFail = true) : (hideFail = false);
+    if (process.env.NODE_ENV === 'development') {
+      config.headers.Authorization =
+        "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzdW5ueSIsImNyZWF0ZWQiOjE1OTQwNDY4MTIxMTcsImV4cCI6MTU5NDY1MTYxMn0.nyeUb6ux9zH7xkV4SML-LlYq9TwsQIZq_o0CUoSKP1Z1NFzF6nyturw_yzsomVhE_VI43ys-Xd6_WbqpFWNvKg";
+    } else {
+      config.headers.Authorization =
+        "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzdW5ueSIsImNyZWF0ZWQiOjE1OTQwNDY4MTIxMTcsImV4cCI6MTU5NDY1MTYxMn0.nyeUb6ux9zH7xkV4SML-LlYq9TwsQIZq_o0CUoSKP1Z1NFzF6nyturw_yzsomVhE_VI43ys-Xd6_WbqpFWNvKg";
+    }
     return config;
   },
   error => Promise.reject(error)

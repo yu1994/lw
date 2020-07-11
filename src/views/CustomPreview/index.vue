@@ -1,7 +1,7 @@
 <template>
   <div class="customPreview">
     <div class="preview" ref="preview">
-      <div class="compile" ref="compile">
+      <div class="layout" ref="compile">
         <div
           class="panel"
           ref="themePanel"
@@ -124,18 +124,24 @@
           <van-icon name="search" :color="$variable.themeColor" size="32" />
         </div>
       </div>
-      <div class="cart">
+      <!--<div class="cart">
         <div class="cart-icon">
           <van-icon name="cart-o" badge="9"  :color="$variable.normalColor" size="2em"/>
         </div>
+      </div>-->
+      <div
+          class="test"
+          style="position: absolute; width: 200px;height: 200px;z-index: 999999999"
+      >
+        <img id="avatar" />
       </div>
     </div>
     <div class="btn-wrap">
       <div class="btn-wrap-buy">
-        <span>立即购买</span>
+        <!--<span>立即购买</span>-->
       </div>
       <div class="btn-wrap-shopping" @click="shoppingHandle">
-        <span>加入购物车</span>
+       <!-- <span>加入购物车</span>-->
       </div>
     </div>
   </div>
@@ -144,9 +150,7 @@
 <script>
 import VueDragResize from "vue-drag-resize";
 import { mapState } from "vuex";
-import { drawImage } from "@/utils";
-import { getInnerWidth } from "@/utils";
-import { cartAddAPI } from "@/api/customPreviewAPI";
+import { drawImageHandle, getInnerWidth, base64ToBlob } from "@/utils";
 
 export default {
   name: "CustomPreview",
@@ -155,6 +159,9 @@ export default {
   },
   data() {
     return {
+      parameter: { //传小程序参数
+
+      },
       layoutRatio: {
         w: 0
       },
@@ -167,19 +174,13 @@ export default {
         top: 0
       },
       areaStyle: {},
-      area: {
-        left: null,
-        top: null,
-        width: null,
-        height: null
-      },
+      photoArea: {}, // 图片调整后的位置
       materialList: [],
       materialNumber: 1 // 有的有多个编辑区域 暂时一个吧
     };
   },
   computed: {
     ...mapState({
-      ratio: state => state.mobileShellParameter.ratio,
       design: state => state.mobileShellParameter.design,
       currentImgAttr: state => state.mobileShellParameter.currentImgAttr, // 用户上传图片的实际宽和高
       currentFile: state => state.mobileShellParameter.currentFile,
@@ -205,6 +206,8 @@ export default {
         compileArea.style.height = this.themeAttr.height + "px";
         compileArea.style.left = this.themeAttr.left + "px";
         compileArea.style.top = this.themeAttr.top + "px";
+        this.photoArea.width = this.themeAttr.width;
+        this.photoArea.height = this.themeAttr.height;
         // 调整范围设置
         dragWrap.style.width = this.themeAttr.width + "px";
         dragWrap.style.height = this.themeAttr.height + "px";
@@ -258,40 +261,72 @@ export default {
       }
     },
     shoppingHandle() {
-      const query = JSON.parse(JSON.stringify(this.themeQuery));
-      cartAddAPI(query).then((response) => {
-        console.info(response)
-      });
+      if (!this.paperBg) {
+        this.paperBg = this.$refs.paperBg[0];
+      }
       const canvas = document.createElement("canvas");
       canvas.width = this.design.backImageWidth;
       canvas.height = this.design.backImageHeight;
       const context = canvas.getContext("2d");
       context.rect(0, 0, canvas.width, canvas.height);
       context.fill();
-      drawImage(context, this.currentTheme.bgTheme, {
-        left: 0,
-        top: 0,
-        width: this.ratio.w,
-        height: this.ratio.h
-      }).then(() => {
-        drawImage(context, this.currentTheme.phone, {
-          left: 0,
-          top: 0,
-          width: this.ratio.w,
-          height: this.ratio.h
-        }).then(() => {
-          drawImage(context, this.currentFile[0].content, {
-            left: this.area.left,
-            top: this.area.top,
-            width: this.area.width,
-            height: this.area.height
-          }).then(() => {
-            let base64 = canvas.toDataURL("image/png"); //"image/png" 这里注意一下
-            let img = document.getElementById("avatar");
-            img.setAttribute("src", base64);
+
+      context.globalCompositeOperation = 'source-over';
+      const themeParam = this.currentTheme.materialExtendList[0];
+      const ratioW =  this.design.viewImageWidth / this.currentTheme.imgWidth;
+      const ratioH =  this.design.viewImageHeight / this.currentTheme.imgHeight;
+      drawImageHandle(
+        context,
+        this.currentFile[0].content,
+        0,
+        0,
+        this.currentImgAttr.w,
+        this.currentImgAttr.h,
+        this.design.offsetX + (this.design.viewImageWidth - themeParam.width * ratioW) / 2,
+        this.design.offsetY + (this.design.viewImageHeight - themeParam.heigth * ratioH) / 2,
+        this.paperBg.clientWidth / this.layoutRatio.w,
+        this.paperBg.clientHeight / this.layoutRatio.w,
+      ).then(() => {
+        drawImageHandle(
+          context,
+          this.design.themeTest,
+          this.design.offsetX,
+          this.design.offsetY,
+          this.design.viewImageWidth,
+          this.design.viewImageHeight
+        ).then(() => {
+          context.globalCompositeOperation = 'xor';
+          drawImageHandle(
+            context,
+            this.design.shade,
+            0,
+            0,
+            this.design.backImageWidth,
+            this.design.backImageHeight
+          ).then(() => {
+            context.globalCompositeOperation = 'source-over';
+            drawImageHandle(
+              context,
+              this.design.max2,
+              0,
+              0,
+              this.design.backImageWidth,
+              this.design.backImageHeight
+            ).then(() => {
+              let base64 = canvas.toDataURL("image/png"); //"image/png" 这里注意一下
+              let img = document.getElementById("avatar");
+              img.setAttribute("src", base64);
+              base64ToBlob(base64, 'image/png', new Date().getTime().toString() +'theme').then((res) => {
+                console.info(res)
+              })
+              // this.parameter.url = ;
+            });
           });
         });
-      });
+      })
+
+
+
     },
     lensHandle() {
       if (!this.preview) {
@@ -337,8 +372,7 @@ export default {
     background-image url("../../assets/img/wallpaper.jpg")
     background-size 100% auto
     background-repeat no-repeat
-    /*transform scale(2)*/
-    .compile
+    .layout
       position absolute
       left 0
       right 0

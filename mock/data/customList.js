@@ -9,7 +9,9 @@ const URL = {
   mask: "/origin/phone.fw.png",
   maxPhone: "/origin/max.png",
   maxPhoneMask: "/origin/max-mask.png",
-  cover: "/origin/cover.png"
+  cover: "/origin/cover.png",
+  shade: "/origin/shade.png",
+  max2: "/origin/max2.png",
 };
 
 for (let i = 0; i < count; i++) {
@@ -70,6 +72,10 @@ export default [
     response: config => ({
       code: 20000,
       data: {
+        themeTest: URL.theme2,
+        theme2: URL.theme2,
+        max2: URL.max2,
+        shade: URL.shade,
         backImageWidth: 800,
         backImageHeight: 800,
         backImage: URL.maxPhone,

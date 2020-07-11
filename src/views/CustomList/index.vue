@@ -3,7 +3,6 @@
     <pack-nav type="primary" title="定制品" />
     <div>
       <div>
-        <!-- <van-sticky>-->
         <div class="photo p16">
           <van-uploader
             :max-count="picSetting.count"
@@ -34,7 +33,6 @@
               更换照片</van-button
             >-->
         </div>
-        <!--</van-sticky>-->
       </div>
       <div class="list">
         <!--  :style="{ backgroundImage: 'url(' + result.background + ')' }"  -->
@@ -44,7 +42,6 @@
             v-for="(item, key) in result.list"
             :key="key"
           >
-            <!-- <pack-phone-layout ref="layout" :item="item" :design="design" :current-file="currentFile" :theme-attr="themeAttr"/>-->
             <div class="layout" ref="layout">
               <div
                 class="panel"
@@ -153,7 +150,7 @@ import {
   customListMockAPI,
   customDesignMockAPI
 } from "../../../mock/API/mock-customList-api";
-import { customListAPI, customMaterialAPI, customDesignAPI } from "@/api/customListAPI";
+import {  customMaterialAPI, customDesignAPI } from "@/api/customListAPI";
 import { getInnerWidth, createImgHandle } from "@/utils";
 
 export default {
@@ -204,12 +201,14 @@ export default {
     async init() {
       this.query = this.$route.query;
       /* 手机模型 */
-      await this.getCustomDesignMockAPI();
-      // await this.getCustomDesignAPI({})
+       await this.getCustomDesignAPI({});
+      if (process.env.NODE_ENV === 'development'){
+        await this.getCustomDesignMockAPI();
+        /* 壁纸 */
+        await this.getCustomListMockAPI();
+      }
       /* 壁纸 */
-      await this.getCustomListMockAPI();
       await this.getCustomMaterialAPI({ category: 1, playingMethod: 4 });
-      // await this.getCustomListAPI();
       this.$nextTick(() => {
         let width = getInnerWidth();
         this.layoutRatio.w = width / 2 / this.design.backImageWidth;
@@ -241,6 +240,7 @@ export default {
     },
     async afterRead(file) {
       const img = await createImgHandle(file);
+      console.info(img.width)
       this.currentImgAttr.w = img.width;
       this.currentImgAttr.h = img.height;
       this.currentFile = [];
@@ -253,7 +253,7 @@ export default {
     getCustomListMockAPI() {
       return new Promise(resolve => {
         customListMockAPI().then(response => {
-          // this.result = response.data;
+           this.result = response.data;
           resolve(true);
         });
       });
@@ -270,15 +270,6 @@ export default {
       return new Promise(resolve => {
         customDesignAPI(params).then(response => {
           this.design = response.data;
-          resolve(true);
-        });
-      });
-    },
-    getCustomListAPI() {
-      return new Promise(resolve => {
-        customListAPI().then(response => {
-          // this.result = response.data;
-          console.info(response);
           resolve(true);
         });
       });
@@ -314,7 +305,7 @@ export default {
 .CustomList
   padding-top 46px
   padding-bottom 120px
-  overflow-y hidden
+  overflow hidden
   .list
     position relative
     background-repeat no-repeat
@@ -366,7 +357,6 @@ export default {
               height 100%
               .compile-area-edit-paper
                 position absolute
-                background-color rebeccapurple
                 background-repeat no-repeat
                 .compile-area-edit-paper-bg
                   position absolute

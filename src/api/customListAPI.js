@@ -2,15 +2,6 @@
 import request from "@/utils/request";
 
 /**
- * @description 主题列表
- * */
-export function customListAPI() {
-  return request({
-    url: "/home/productList"
-  });
-}
-
-/**
  *
  * @description 获取素材列表
  * */

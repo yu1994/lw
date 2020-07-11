@@ -10,8 +10,13 @@
 <script>
 export default {
   name: "test",
-  methods: {},
+  methods: {
+    test(val){
+      console.info(val.join())
+    }
+  },
   mounted() {
+    this.test([1,2,3])
     const oDiv = this.$refs.div1;
     const oDiv2 = this.$refs.div2;
     console.info(oDiv)
